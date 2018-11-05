@@ -16,6 +16,16 @@
 
     v($signin_user,'$signin_user');
 
+    if (!empty($_POST)) {
+        $sql = "UPDATE `feeds` SET `feed` = ? WHERE `feeds`.`id` = ?";
+        $stmt = $dbh->prepare($sql);
+        $data = array($_POST['feed'],$feed_id);
+        $stmt->execute($data);
+
+        header("Location: timeline.php");
+        exit();
+    }
+
 ?>
 <!DOCTYPE html>
 <html lang="ja">
