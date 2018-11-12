@@ -12,7 +12,7 @@
 
     $signin_user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    v($signin_user,'$signin_user');
+    // v($signin_user,'$signin_user');
 
     if (!empty($_POST)) {
         $feed= $_POST['feed'];
@@ -56,11 +56,40 @@
             if ($feed == false) {
                 break;
         }
+        // いいね済みかどうかの確認
+        $like_flg_sql = "SELECT * FROM `likes` WHERE `user_id` = ? AND `feed_id` = ?";
+        $like_flg_data = [$signin_user['id'], $feed['id']];
+        $like_flg_stmt = $dbh->prepare($like_flg_sql);
+        $like_flg_stmt->execute($like_flg_data);
+
+        $is_liked = $like_flg_stmt->fetch(PDO::FETCH_ASSOC);
+
+        // 三項演算子 条件式 ? trueだった場合 : falseだった場合
+        $feed['is_liked'] = $is_liked ? true : false;
         // []は配列の末尾にデータを追加する
+        // v($feed,'$feed');
+
+        $like_sql = "SELECT COUNT(*) AS `like_count` FROM likes WHERE `feed_id`=?";
+        $like_data = [$feed['id']];
+        $like_stmt = $dbh->prepare($like_sql);
+        $like_stmt->execute($like_data);
+
+
+        $like = $like_stmt->fetch(PDO::FETCH_ASSOC);
+
+        // v($like,'$like');
+
+        $feed['like_count'] = $like['like_count'];
+
         $feeds[] = $feed;
     }
 
+
+
     // v($feeds,'$feeds');
+
+
+
 
 ?>
 <!DOCTYPE html>
@@ -97,6 +126,7 @@
         </form>
         <ul class="nav navbar-nav navbar-right">
           <li class="dropdown">
+            <span class hidden id="signin_user"><?php echo $signin_user["id"] ?></span>
             <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img src="user_profile_img/<?php echo $signin_user['img_name'] ?>" width="18" class="img-circle"><?php echo $signin_user['name'] ?> <span class="caret"></span></a>
             <ul class="dropdown-menu">
               <li><a href="#">マイページ</a></li>
@@ -151,5 +181,6 @@
   <script src="assets/js/jquery-3.1.1.js"></script>
   <script src="assets/js/jquery-migrate-1.4.1.js"></script>
   <script src="assets/js/bootstrap.js"></script>
+  <script src="assets/js/app.js"></script>
 </body>
 </html>
