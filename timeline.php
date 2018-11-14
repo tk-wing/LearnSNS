@@ -39,7 +39,7 @@
     // 別名指定
     // $sql = 'SELECT `feeds`.*, `users`.`name`, `users`.`img_name` AS `profile_img` FROM `feeds` LEFT JOIN `users` ON `feeds`.`user_id` = `users`.`id` ORDER BY `created` DESC';
 
-    $sql = 'SELECT `f`.*, `u`.`name`, `u`.`img_name` AS `profile_img` FROM `feeds` AS `f` LEFT JOIN `users` AS `u` ON `f`.`user_id` = `u`.`id` ORDER BY `created` DESC';
+    $sql = 'SELECT `f`.*, `u`.`name`, `u`.`img_name` AS `profile_img` FROM `feeds` AS `f` INNER JOIN `users` AS `u` ON `f`.`user_id` = `u`.`id` ORDER BY `created` DESC';
 
 
     // DESC 大きい数字から小さい数字へ 降順
@@ -57,38 +57,37 @@
                 break;
         }
         // いいね済みかどうかの確認
-        $like_flg_sql = "SELECT * FROM `likes` WHERE `user_id` = ? AND `feed_id` = ?";
-        $like_flg_data = [$signin_user['id'], $feed['id']];
-        $like_flg_stmt = $dbh->prepare($like_flg_sql);
-        $like_flg_stmt->execute($like_flg_data);
+        $like_flag_sql = "SELECT * FROM `likes` WHERE `user_id` = ? AND `feed_id` = ?";
+        $like_flag_data = [$signin_user['id'], $feed['id']];
+        $like_flag_stmt = $dbh->prepare($like_flag_sql);
+        $like_flag_stmt->execute($like_flag_data);
 
-        $is_liked = $like_flg_stmt->fetch(PDO::FETCH_ASSOC);
-
+        $is_liked = $like_flag_stmt->fetch(PDO::FETCH_ASSOC);
+        // v($is_liked,'$is_liked');
         // 三項演算子 条件式 ? trueだった場合 : falseだった場合
+        // 三項演算子(if文の省略型。代入のみの場合に使える)
         $feed['is_liked'] = $is_liked ? true : false;
-        // []は配列の末尾にデータを追加する
-        // v($feed,'$feed');
+        // if ($is_liked){
+        //   $feed['is_liked'] = true;
+        // }else{
+        //   $feed['is_liked'] = false;
+        // }
+
 
         $like_sql = "SELECT COUNT(*) AS `like_count` FROM likes WHERE `feed_id`=?";
         $like_data = [$feed['id']];
         $like_stmt = $dbh->prepare($like_sql);
         $like_stmt->execute($like_data);
 
-
-        $like = $like_stmt->fetch(PDO::FETCH_ASSOC);
-
+        $like_count_data = $like_stmt->fetch(PDO::FETCH_ASSOC);
         // v($like,'$like');
+        $feed['like_count'] = $like_count_data['like_count'];
 
-        $feed['like_count'] = $like['like_count'];
-
+        // v($feed,'$feed');
         $feeds[] = $feed;
     }
 
-
-
     // v($feeds,'$feeds');
-
-
 
 
 ?>

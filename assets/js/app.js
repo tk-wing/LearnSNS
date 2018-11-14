@@ -20,7 +20,8 @@ $(function() {
             datatype: 'json', //受信してくるデータのタイプの形式
             data:{
               'feed_id':feed_id,
-              'user_id':user_id
+              'user_id':user_id,
+              'is_liked':true
             }
         })
         .done(function(data){
@@ -33,7 +34,7 @@ $(function() {
                 like_btn.children('span').text('いいねを取り消す');
             }
 
-          console.log(data);
+          // console.log(data);
         })
         .fail(function(err){
           // 目的の処理が失敗したときの処理
@@ -48,6 +49,9 @@ $(function() {
         var like_btn = $(this);
         var like_count = $(this).siblings('.like_count').text();
 
+        console.log(feed_id);
+        console.log(user_id);
+
       $.ajax({
           url: 'like.php',
           type:'POST',
@@ -55,7 +59,6 @@ $(function() {
           data:{
             'feed_id':feed_id,
             'user_id':user_id,
-            'is_unlike':true
           }
 
       })
@@ -66,7 +69,10 @@ $(function() {
               like_btn.removeClass('js-unlike');
               like_btn.addClass('js-like');
               like_btn.children('span').text('いいね');
+
+
           }
+          // console.log(data);
 
 
       })
