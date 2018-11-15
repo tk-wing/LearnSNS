@@ -39,13 +39,20 @@
     // 別名指定
     // $sql = 'SELECT `feeds`.*, `users`.`name`, `users`.`img_name` AS `profile_img` FROM `feeds` LEFT JOIN `users` ON `feeds`.`user_id` = `users`.`id` ORDER BY `created` DESC';
 
-    $sql = 'SELECT `f`.*, `u`.`name`, `u`.`img_name` AS `profile_img` FROM `feeds` AS `f` INNER JOIN `users` AS `u` ON `f`.`user_id` = `u`.`id` ORDER BY `created` DESC';
+    if(isset($_GET['search_word'])){
+        // $search_word = "%{$_GET['search_word']}%";
+        $search_word = $_GET['search_word'];
+        $sql = 'SELECT `f`.*, `u`.`name`, `u`.`img_name` AS `profile_img` FROM `feeds` AS `f` LEFT JOIN `users` AS `u` ON `f`.`user_id` = `u`.`id`  WHERE `f`.`feed` LIKE "%"?"%" ORDER BY `created` DESC';
+        $data = [$search_word];
+    }else{
+        $sql = 'SELECT `f`.*, `u`.`name`, `u`.`img_name` AS `profile_img` FROM `feeds` AS `f` LEFT JOIN `users` AS `u` ON `f`.`user_id` = `u`.`id` ORDER BY `created` DESC';
+        $data = [];
+    }
 
 
     // DESC 大きい数字から小さい数字へ 降順
     // ASC 小さい数字から大きい数字へ 昇順→デフォルトはこっち！
     $stmt = $dbh->prepare($sql);
-    $data = array();
     $stmt->execute($data);
 
     // 投稿データをすべて格納する
@@ -88,6 +95,15 @@
     }
 
     // v($feeds,'$feeds');
+
+    if(isset($_GET['search_word'])){
+        $search_word = $_GET['search_word'];
+        $sql = $sql = 'SELECT `f`.*, `u`.`name`, `u`.`img_name` AS `profile_img` FROM `feeds` AS `f` LEFT JOIN `users` AS `u` WHERE f.feed LIKE "%?%" ORDER BY `created` DESC';
+        $data = array($search_word);
+    }else{
+        $sql = 'SELECT `f`.*, `u`.`name`, `u`.`img_name` AS `profile_img` FROM `feeds` AS `f` INNER JOIN `users` AS `u` ON `f`.`user_id` = `u`.`id` ORDER BY `created` DESC';
+        $data = array();
+    }
 
 
 ?>
